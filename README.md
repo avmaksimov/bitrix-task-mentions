@@ -1,4 +1,4 @@
-# Maxima Pridex Task Mentions
+# Максима Прайдекс: автодобавление участников задач по упоминаниям
 
 **Русский** · [English](README.en.md)
 
@@ -24,32 +24,34 @@
 Подключитесь к серверу по SSH. Команды можно выполнять от `root` (или с доступом к `sudo`):
 
 ```bash
-curl -fL --retry 2 -o /tmp/bitrix-task-mentions.tar.gz \
-  https://github.com/avmaksimov/bitrix-task-mentions/archive/refs/heads/main.tar.gz
+(
+  set -e
+  tmp_dir=$(mktemp -d /tmp/bitrix-task-mentions.XXXXXXXX)
+  trap 'rm -rf -- "$tmp_dir"' EXIT
 
-sudo install -d -o bitrix -g bitrix -m 755 \
-  /home/bitrix/www/local /home/bitrix/www/local/modules
+  curl -fL --retry 2 -o "$tmp_dir/source.tar.gz" \
+    https://github.com/avmaksimov/bitrix-task-mentions/archive/refs/heads/main.tar.gz
 
-sudo tar -xzf /tmp/bitrix-task-mentions.tar.gz \
-  -C /home/bitrix/www --strip-components=1 \
-  bitrix-task-mentions-main/local/modules/maximapridex.taskmentions
+  tar -xzf "$tmp_dir/source.tar.gz" -C "$tmp_dir" \
+    bitrix-task-mentions-main/local/modules/maximapridex.taskmentions
+
+  source_dir="$tmp_dir/bitrix-task-mentions-main/local/modules/maximapridex.taskmentions"
+  target_dir=/home/bitrix/www/local/modules/maximapridex.taskmentions
+
+  sudo install -d -o bitrix -g bitrix -m 755 \
+    /home/bitrix/www/local /home/bitrix/www/local/modules "$target_dir"
+  sudo cp -a "$source_dir/." "$target_dir/"
+  sudo chown -R bitrix:bitrix "$target_dir"
+  sudo find "$target_dir" -type d -exec chmod 755 {} +
+  sudo find "$target_dir" -type f -exec chmod 644 {} +
+)
 ```
 
-Архив репозитория скачивается целиком во временный файл `/tmp/bitrix-task-mentions.tar.gz`, но команда `tar` извлекает **только каталог модуля**. README, лицензия и прочие файлы репозитория в корень сайта не копируются.
-
-Каталог модуля должен получиться таким:
+Скачивание и распаковка выполняются **только во временном каталоге** `/tmp/bitrix-task-mentions.XXXXXXXX`, который создаётся отдельно для каждого запуска и удаляется после выполнения команд (включая ошибки). Из архива извлекается только модуль; README, LICENSE и остальные файлы репозитория на сайт не копируются. **Лишь после успешной распаковки** файлы модуля копируются в рабочий каталог:
 
 `/home/bitrix/www/local/modules/maximapridex.taskmentions/`
 
-Назначьте правильного владельца и права, **особенно если распаковывали от `root`**:
-
-```bash
-sudo chown -R bitrix:bitrix /home/bitrix/www/local/modules/maximapridex.taskmentions
-sudo find /home/bitrix/www/local/modules/maximapridex.taskmentions -type d -exec chmod 755 {} +
-sudo find /home/bitrix/www/local/modules/maximapridex.taskmentions -type f -exec chmod 644 {} +
-```
-
-Права: папки `755`, обычные файлы `644`. Не используйте `777`. Содержимое `/local/` — часть сайта Битрикс24, а не каталог в корне Linux.
+Команды сразу назначают владельца `bitrix:bitrix` и права: каталоги `755`, файлы `644`, в том числе при запуске от `root`. Не используйте `777`. Содержимое `/local/` — часть сайта Битрикс24, а не каталог в корне Linux.
 
 ### 2. Проверить защиту `/local/` в nginx
 
@@ -110,7 +112,7 @@ sudo systemctl reload nginx
 
 ### 3. Установить модуль в Битрикс24
 
-Войдите на портал с правами администратора. В интерфейсе коробочного Битрикс24 откройте **Маркетплейс → меню (⋯/«Ещё») → Установить** и установите модуль **Maxima Pridex: участники задач по упоминанию**. Названия пунктов могут немного отличаться в зависимости от версии портала.
+Войдите на портал с правами администратора. В интерфейсе коробочного Битрикс24 откройте **Маркетплейс → меню (⋯/«Ещё») → Установить** и установите модуль **Максима Прайдекс: автодобавление участников задач по упоминаниям**. Названия пунктов могут немного отличаться в зависимости от версии портала.
 
 Копирование файлов на сервер само по себе не регистрирует обработчик событий: установку в портале нужно выполнить **один раз**.
 

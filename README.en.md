@@ -1,4 +1,4 @@
-# Maxima Pridex Task Mentions
+# Maxima Pridex: Automatically Add Task Participants from Mentions
 
 [Русский](README.md) · **English**
 
@@ -24,32 +24,34 @@ The commands below assume the standard BitrixVM paths: document root `/home/bitr
 Connect over SSH. Run these commands as `root` or with `sudo` access:
 
 ```bash
-curl -fL --retry 2 -o /tmp/bitrix-task-mentions.tar.gz \
-  https://github.com/avmaksimov/bitrix-task-mentions/archive/refs/heads/main.tar.gz
+(
+  set -e
+  tmp_dir=$(mktemp -d /tmp/bitrix-task-mentions.XXXXXXXX)
+  trap 'rm -rf -- "$tmp_dir"' EXIT
 
-sudo install -d -o bitrix -g bitrix -m 755 \
-  /home/bitrix/www/local /home/bitrix/www/local/modules
+  curl -fL --retry 2 -o "$tmp_dir/source.tar.gz" \
+    https://github.com/avmaksimov/bitrix-task-mentions/archive/refs/heads/main.tar.gz
 
-sudo tar -xzf /tmp/bitrix-task-mentions.tar.gz \
-  -C /home/bitrix/www --strip-components=1 \
-  bitrix-task-mentions-main/local/modules/maximapridex.taskmentions
+  tar -xzf "$tmp_dir/source.tar.gz" -C "$tmp_dir" \
+    bitrix-task-mentions-main/local/modules/maximapridex.taskmentions
+
+  source_dir="$tmp_dir/bitrix-task-mentions-main/local/modules/maximapridex.taskmentions"
+  target_dir=/home/bitrix/www/local/modules/maximapridex.taskmentions
+
+  sudo install -d -o bitrix -g bitrix -m 755 \
+    /home/bitrix/www/local /home/bitrix/www/local/modules "$target_dir"
+  sudo cp -a "$source_dir/." "$target_dir/"
+  sudo chown -R bitrix:bitrix "$target_dir"
+  sudo find "$target_dir" -type d -exec chmod 755 {} +
+  sudo find "$target_dir" -type f -exec chmod 644 {} +
+)
 ```
 
-The full repository archive is downloaded to `/tmp/bitrix-task-mentions.tar.gz`, but the `tar` command extracts **only the module directory**. README, LICENSE, and other repository files are not copied into the website root.
-
-The resulting module directory must be:
+The download and extraction take place **entirely in a temporary directory** (`/tmp/bitrix-task-mentions.XXXXXXXX`), created for each run and removed afterwards (including on errors). Only the module is extracted; README, LICENSE, and other repository files are not copied into the website. **After successful extraction**, the module files are copied to:
 
 `/home/bitrix/www/local/modules/maximapridex.taskmentions/`
 
-Set the correct owner and permissions, **especially if you extracted files as `root`**:
-
-```bash
-sudo chown -R bitrix:bitrix /home/bitrix/www/local/modules/maximapridex.taskmentions
-sudo find /home/bitrix/www/local/modules/maximapridex.taskmentions -type d -exec chmod 755 {} +
-sudo find /home/bitrix/www/local/modules/maximapridex.taskmentions -type f -exec chmod 644 {} +
-```
-
-Directories use mode `755`, regular files `644`. Do not use `777`. `/local/` is inside the Bitrix24 web document root, not the Linux filesystem root.
+The commands also set owner `bitrix:bitrix` and permissions (`755` for directories, `644` for files), even if run as `root`. Do not use `777`. `/local/` is inside the Bitrix24 web document root, not the Linux filesystem root.
 
 ### 2. Verify nginx protection for `/local/`
 
@@ -110,7 +112,7 @@ Expect `403` for the directory and the PHP file. If the result differs, ask the 
 
 ### 3. Register the module in Bitrix24
 
-Sign in as a portal administrator. In the self-hosted Bitrix24 interface, navigate to **Marketplace → menu (⋯ / More) → Install** and install **Maxima Pridex: Task Mentions**. The exact menu labels may vary between portal versions.
+Sign in as a portal administrator. In the self-hosted Bitrix24 interface, navigate to **Marketplace → menu (⋯ / More) → Install** and install **Maxima Pridex: Automatically Add Task Participants from Mentions**. The exact menu labels may vary between portal versions.
 
 Copying files does not register the PHP event handler. This step is required **once** for the initial installation.
 
