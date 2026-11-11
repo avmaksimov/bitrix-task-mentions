@@ -38,6 +38,9 @@ if ($request->isPost()
 }
 
 $role = (string)Option::get($moduleId, 'role', '0');
+$arModuleVersion = [];
+require __DIR__ . '/install/version.php';
+$moduleVersion = (string)($arModuleVersion['VERSION'] ?? '');
 $tabs = [
     [
         'DIV' => 'maximapridex_taskmentions_settings',
@@ -81,6 +84,9 @@ $tabControl = new CAdminTabControl('maximapridex_taskmentions_tab', $tabs);
             <strong><?=htmlspecialcharsbx(Loc::getMessage('MP_TM_REPOSITORY'))?></strong>
             <div style="margin-top: 12px;">
                 <a href="https://github.com/avmaksimov/bitrix-task-mentions" target="_blank" rel="noopener noreferrer">https://github.com/avmaksimov/bitrix-task-mentions</a>
+                <div style="margin-top: 10px; color: #777; font-size: 12px;">
+                    <?=htmlspecialcharsbx(Loc::getMessage('MP_TM_VERSION'))?>: <?=htmlspecialcharsbx($moduleVersion)?>
+                </div>
             </div>
         </td>
     </tr>

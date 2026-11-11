@@ -18,3 +18,4 @@ $MESS['MP_TM_INVALID_ROLE'] = 'Invalid role setting.';
 $MESS['MP_TM_ABOUT_TITLE'] = 'How the module works';
 $MESS['MP_TM_ABOUT_TEXT'] = 'When a user is @mentioned in a task chat, the module attempts to add them in the selected role. Existing participants are not added again or reassigned. Other chats are not affected.';
 $MESS['MP_TM_REPOSITORY'] = 'Source code, documentation and license';
+$MESS['MP_TM_VERSION'] = 'Module version';
