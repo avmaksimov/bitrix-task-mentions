@@ -47,7 +47,7 @@ final class Handler
             return;
         }
 
-        $role = (int)Option::get('maximapridex.taskmentions', 'role');
+        $role = (int)Option::get('maximapridex.taskmentions', 'role', '0');
         if ($role !== 0 && $role !== 1)
         {
             self::logError('Unknown role value; expected 0 or 1.');

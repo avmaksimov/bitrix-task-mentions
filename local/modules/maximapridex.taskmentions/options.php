@@ -37,7 +37,7 @@ if ($request->isPost()
     }
 }
 
-$role = Option::get($moduleId, 'role');
+$role = (string)Option::get($moduleId, 'role', '0');
 $tabs = [
     [
         'DIV' => 'maximapridex_taskmentions_settings',
@@ -54,26 +54,35 @@ $tabControl = new CAdminTabControl('maximapridex_taskmentions_tab', $tabs);
     $tabControl->BeginNextTab();
     ?>
     <tr>
-        <td colspan="2">
+        <td colspan="2" style="padding-bottom: 16px;">
             <strong><?=htmlspecialcharsbx(Loc::getMessage('MP_TM_ABOUT_TITLE'))?></strong>
-            <p><?=htmlspecialcharsbx(Loc::getMessage('MP_TM_ABOUT_TEXT'))?></p>
+            <p style="margin: 12px 0 8px;"><?=htmlspecialcharsbx(Loc::getMessage('MP_TM_ABOUT_TEXT'))?></p>
+            <p style="margin: 0;"><?=htmlspecialcharsbx(Loc::getMessage('MP_TM_PERMISSIONS'))?></p>
         </td>
     </tr>
     <tr>
-        <td width="40%"><label for="maximapridex_taskmentions_role"><?=htmlspecialcharsbx(Loc::getMessage('MP_TM_ROLE'))?></label></td>
-        <td width="60%">
-            <select id="maximapridex_taskmentions_role" name="role">
-                <option value="0" <?=$role === '0' ? 'selected' : ''?>><?=htmlspecialcharsbx(Loc::getMessage('MP_TM_ACCOMPLICES'))?></option>
-                <option value="1" <?=$role === '1' ? 'selected' : ''?>><?=htmlspecialcharsbx(Loc::getMessage('MP_TM_AUDITORS'))?></option>
-            </select>
+        <td colspan="2" style="padding-top: 12px; padding-bottom: 16px;">
+            <strong><?=htmlspecialcharsbx(Loc::getMessage('MP_TM_SETTINGS_TITLE'))?></strong>
+            <div style="display: flex; align-items: center; flex-wrap: wrap; column-gap: 18px; row-gap: 10px; margin-top: 12px;">
+                <span><?=htmlspecialcharsbx(Loc::getMessage('MP_TM_ROLE'))?></span>
+                <label style="display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;">
+                    <input type="radio" name="role" value="0" <?=$role !== '1' ? 'checked' : ''?>>
+                    <?=htmlspecialcharsbx(Loc::getMessage('MP_TM_ACCOMPLICES'))?>
+                </label>
+                <label style="display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;">
+                    <input type="radio" name="role" value="1" <?=$role === '1' ? 'checked' : ''?>>
+                    <?=htmlspecialcharsbx(Loc::getMessage('MP_TM_AUDITORS'))?>
+                </label>
+            </div>
         </td>
     </tr>
     <tr>
-        <td width="40%"><?=htmlspecialcharsbx(Loc::getMessage('MP_TM_REPOSITORY'))?></td>
-        <td width="60%"><a href="https://github.com/avmaksimov/bitrix-task-mentions" target="_blank" rel="noopener noreferrer">github.com/avmaksimov/bitrix-task-mentions</a></td>
-    </tr>
-    <tr>
-        <td colspan="2" align="center"><?=htmlspecialcharsbx(Loc::getMessage('MP_TM_PERMISSIONS'))?></td>
+        <td colspan="2" style="padding-top: 12px; padding-bottom: 12px;">
+            <strong><?=htmlspecialcharsbx(Loc::getMessage('MP_TM_REPOSITORY'))?></strong>
+            <div style="margin-top: 12px;">
+                <a href="https://github.com/avmaksimov/bitrix-task-mentions" target="_blank" rel="noopener noreferrer">https://github.com/avmaksimov/bitrix-task-mentions</a>
+            </div>
+        </td>
     </tr>
     <?php
     $tabControl->Buttons();

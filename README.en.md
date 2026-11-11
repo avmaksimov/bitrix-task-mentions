@@ -15,11 +15,11 @@ A free local module for **self-hosted Bitrix24**. When a user is `@mentioned` in
 - Ignores unrelated chats, legacy forum comments, and system messages.
 - Choose **co-assignees (0)** or **observers (1)** in the standard module settings. The selection is stored in the portal database.
 
-## Installation (standard BitrixVM, Linux)
+## Installation and updates (standard BitrixVM, Linux)
 
-The commands below assume the standard BitrixVM paths: document root `/home/bitrix/www`, site account `bitrix`, and an already published GitHub repository `avmaksimov/bitrix-task-mentions` with the `main` branch.
+The **same command in step 1** is used both for initial installation and subsequent updates. Steps 2–4 are needed only for the initial installation (or if your nginx configuration changes later). These instructions assume the standard BitrixVM paths: document root `/home/bitrix/www`, site account `bitrix`, and the `main` branch of the GitHub repository `avmaksimov/bitrix-task-mentions`.
 
-### 1. Download and extract
+### 1. Download and extract (installation and updates)
 
 Connect over SSH. Run these commands as `root` or with `sudo` access:
 
@@ -52,6 +52,10 @@ The download and extraction take place **entirely in a temporary directory** (`/
 `/home/bitrix/www/local/modules/maximapridex.taskmentions/`
 
 The commands also set owner `bitrix:bitrix` and permissions (`755` for directories, `644` for files), even if run as `root`. Do not use `777`. `/local/` is inside the Bitrix24 web document root, not the Linux filesystem root.
+
+**On updates:** repeat this step only. Files with matching names are overwritten; existing database settings remain intact, and there is no need to register the module again. Files removed from newer releases are not deleted automatically; review and remove any obsolete files separately. Clear PHP OPcache using your normal procedure if necessary, and test the module afterwards.
+
+## Initial installation only
 
 ### 2. Verify nginx protection for `/local/`
 
@@ -122,16 +126,7 @@ Open **Settings → Product settings → Module settings** and select the module
 
 `https://portal.example.com/bitrix/admin/settings.php?mid=maximapridex.taskmentions&lang=en`
 
-Choose **Co-assignees** (default) or **Observers**, then save. In a test task, `@mention` a user and verify that they are added. Also try a mention written by an assignee: permissions belong to the **message author**, not only the task creator.
-
-## Manual updates
-
-1. Review the upstream changes and choose an appropriate maintenance window.
-2. Repeat the commands in **step 1**: download the latest archive, extract it, and set file permissions. Existing files with matching names will be overwritten. Files deleted by an upstream release are **not automatically removed**, so review and remove obsolete files manually if needed.
-3. The module is already registered; **do not install it again**. Database-stored settings are preserved.
-4. If necessary, clear PHP OPcache or restart PHP workers by your standard procedure, then retest `@mentions`.
-
-**Updates are manual.** Review the changes and archive source before updating; use a trusted public repository.
+**Co-assignees** are already selected by default. There is no need to save this unchanged setting. To choose **Observers**, select the radio button and save. In a test task, `@mention` a user and verify that they are added. Also try a mention written by an assignee: permissions belong to the **message author**, not only the task creator.
 
 ## Removal
 
